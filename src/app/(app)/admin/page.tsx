@@ -60,30 +60,32 @@ export default async function AdminPage({
             <div className="lbl">Customers · {activeCustomers} with purchases</div>
           </div>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Branch</th>
-              <th className="num">Purchases</th>
-              <th className="num">Total sales</th>
-            </tr>
-          </thead>
-          <tbody>
-            {branches.map((b) => (
-              <tr key={b.branch_id}>
-                <td>{b.branch_name}</td>
-                <td className="num">{Number(b.purchases)}</td>
-                <td className="num">{money(b.total)}</td>
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Branch</th>
+                <th className="num">Purchases</th>
+                <th className="num">Total sales</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {branches.map((b) => (
+                <tr key={b.branch_id}>
+                  <td>{b.branch_name}</td>
+                  <td className="num">{Number(b.purchases)}</td>
+                  <td className="num">{money(b.total)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="card">
         <h2>All customers — sales to date</h2>
         {customers.length > 0 ? (
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-scroll">
             <table>
               <thead>
                 <tr>

@@ -93,7 +93,7 @@ export default async function ReportsPage({
         ) : null}
 
         {recent && recent.length > 0 ? (
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-scroll">
             <table>
               <thead>
                 <tr>
