@@ -34,6 +34,7 @@ function ErrBanner({ error, msg }: { error?: string; msg?: string }) {
     consent: "Please tick the consent box to enroll the customer.",
     amount: "Enter a valid purchase amount.",
     phone: "Phone number must be exactly 11 digits.",
+    nobranch: "Head Office can't record sales — sign in with a branch login.",
     points: "Enter a valid number of points.",
     save: "Could not save. Check your connection and try again.",
     redeem: msg ?? "Could not redeem points.",
@@ -51,7 +52,8 @@ export default async function CapturePage({
     msg?: string;
   }>;
 }) {
-  await requireProfile();
+  const profile = await requireProfile();
+  const canRecord = profile.branch_id !== null; // head office has no branch
   const { phone, ok, error, msg } = await searchParams;
   const query = (phone ?? "").trim();
 
@@ -122,46 +124,58 @@ export default async function CapturePage({
               {balance} <small>points{balance ? ` · PKR ${balance} value` : ""}</small>
             </p>
 
-            <form action={recordPurchase}>
-              <input type="hidden" name="customer_id" value={customer.id} />
-              <input type="hidden" name="phone" value={customer.phone} />
-              <label htmlFor="amount">Purchase amount (PKR)</label>
-              <input id="amount" name="amount" type="number" min="1" step="1" required />
-              <button className="btn" type="submit">
-                Record purchase
-              </button>
-              <p className="hint">
-                Earns 1 point per PKR {PKR_PER_POINT_EARNED}.
-              </p>
-            </form>
-          </div>
-
-          <div className="card">
-            <h2>Redeem points</h2>
-            {balance >= MIN_REDEEM_BALANCE ? (
-              <form action={redeemPoints}>
+            {canRecord ? (
+              <form action={recordPurchase}>
                 <input type="hidden" name="customer_id" value={customer.id} />
                 <input type="hidden" name="phone" value={customer.phone} />
-                <label htmlFor="points">Points to redeem (1 point = PKR 1)</label>
-                <input
-                  id="points"
-                  name="points"
-                  type="number"
-                  min="1"
-                  max={balance}
-                  step="1"
-                  required
-                />
-                <button className="btn secondary" type="submit">
-                  Redeem
+                <label htmlFor="amount">Purchase amount (PKR)</label>
+                <input id="amount" name="amount" type="number" min="1" step="1" required />
+                <button className="btn" type="submit">
+                  Record purchase
                 </button>
+                <p className="hint">
+                  Earns 1 point per PKR {PKR_PER_POINT_EARNED}.
+                </p>
               </form>
             ) : (
-              <p className="meta">
-                Needs at least {MIN_REDEEM_BALANCE} points to redeem (has {balance}).
-              </p>
+              <div
+                className="alert"
+                style={{ background: "var(--primary-tint)", color: "var(--primary-dark)", border: "1px solid #cfe0f8" }}
+              >
+                You&apos;re signed in as <strong>Head Office</strong>. Recording sales and
+                redeeming points is done from a <strong>branch login</strong>.
+              </div>
             )}
           </div>
+
+          {canRecord ? (
+            <div className="card">
+              <h2>Redeem points</h2>
+              {balance >= MIN_REDEEM_BALANCE ? (
+                <form action={redeemPoints}>
+                  <input type="hidden" name="customer_id" value={customer.id} />
+                  <input type="hidden" name="phone" value={customer.phone} />
+                  <label htmlFor="points">Points to redeem (1 point = PKR 1)</label>
+                  <input
+                    id="points"
+                    name="points"
+                    type="number"
+                    min="1"
+                    max={balance}
+                    step="1"
+                    required
+                  />
+                  <button className="btn secondary" type="submit">
+                    Redeem
+                  </button>
+                </form>
+              ) : (
+                <p className="meta">
+                  Needs at least {MIN_REDEEM_BALANCE} points to redeem (has {balance}).
+                </p>
+              )}
+            </div>
+          ) : null}
 
           <details className="card">
             <summary>Edit name / address</summary>

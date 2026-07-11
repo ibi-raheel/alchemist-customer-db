@@ -77,6 +77,9 @@ export async function recordPurchase(formData: FormData) {
   if (!customerId || !Number.isFinite(amount) || amount <= 0) {
     redirect(`/?phone=${encodeURIComponent(phone)}&error=amount`);
   }
+  if (!profile.branch_id) {
+    redirect(`/?phone=${encodeURIComponent(phone)}&error=nobranch`);
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.from("purchases").insert({
