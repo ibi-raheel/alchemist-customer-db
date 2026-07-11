@@ -1,21 +1,22 @@
 /* Lightweight, system-font styling — no web fonts, no CSS framework.
-   Mobile-first, large touch targets for counter use on a tablet/phone. */
+   Blue & white theme. Mobile-first, large touch targets for counter use. */
 
 :root {
-  --green: #1a7f5a;
-  --green-dark: #14664799;
-  --ink: #1b2430;
-  --muted: #5b6773;
-  --line: #e2e6ea;
-  --bg: #f6f8f9;
+  --primary: #1668d6;
+  --primary-dark: #0f4fa6;
+  --primary-tint: #eaf1fc;
+  --ink: #15213a;
+  --muted: #5a6a82;
+  --line: #dbe3ef;
+  --bg: #f3f7fc;
   --card: #ffffff;
-  --danger: #b3261e;
-  --ok: #1a7f5a;
-  --radius: 12px;
+  --danger: #c0362c;
+  --ok: #157a4a;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(21, 33, 58, 0.04), 0 6px 20px rgba(21, 33, 58, 0.06);
 }
 
 * { box-sizing: border-box; }
-
 html { -webkit-text-size-adjust: 100%; }
 
 body {
@@ -26,99 +27,128 @@ body {
   line-height: 1.45;
 }
 
-a { color: var(--green); }
+a { color: var(--primary); }
 
-/* Fluid width: comfortable column on phones, wider on tablet/desktop so
-   reports and tables get breathing room. */
 .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 16px; }
 @media (min-width: 768px)  { .container { max-width: 760px; padding: 24px; } }
 @media (min-width: 1200px) { .container { max-width: 940px; } }
 
 /* Top bar */
 .topbar {
-  background: var(--green);
+  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: #fff;
-  padding: 12px 16px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px 12px;
   flex-wrap: wrap;
+  box-shadow: var(--shadow);
 }
-.topbar .brand { font-weight: 700; font-size: 1.05rem; }
+.topbar .brand { font-weight: 700; font-size: 1.1rem; letter-spacing: 0.2px; }
 .topbar .branch { font-size: 0.85rem; opacity: 0.9; }
 .nav { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
 .nav a, .nav button {
-  color: #fff; background: transparent; border: 1px solid #ffffff55;
-  padding: 6px 12px; border-radius: 999px; font-size: 0.9rem; text-decoration: none;
-  cursor: pointer;
+  color: #fff; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 7px 13px; border-radius: 999px; font-size: 0.9rem; text-decoration: none;
+  cursor: pointer; font-family: inherit;
 }
-.nav a.active { background: #ffffff26; }
+.nav a:hover, .nav button:hover { background: rgba(255, 255, 255, 0.22); }
+.nav a.active { background: rgba(255, 255, 255, 0.28); }
 
 /* Cards */
 .card {
   background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 16px; margin: 14px 0;
+  border-radius: var(--radius); padding: 18px; margin: 14px 0;
+  box-shadow: var(--shadow);
 }
-.card h2 { margin: 0 0 12px; font-size: 1.1rem; }
+.card h2 { margin: 0 0 14px; font-size: 1.15rem; }
 
 /* Forms — big fields for touch */
-label { display: block; font-size: 0.9rem; color: var(--muted); margin: 10px 0 4px; }
+label { display: block; font-size: 0.9rem; color: var(--muted); margin: 12px 0 5px; font-weight: 500; }
 input[type="text"], input[type="tel"], input[type="number"],
-input[type="email"], input[type="password"] {
+input[type="email"], input[type="password"], select {
   width: 100%; padding: 14px; font-size: 1.05rem;
-  border: 1px solid var(--line); border-radius: 10px; background: #fff;
+  border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink);
+  font-family: inherit;
 }
-input:focus { outline: 2px solid var(--green); border-color: var(--green); }
+input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22, 104, 214, 0.15); }
 
 button.btn, .btn {
   display: inline-block; width: 100%; padding: 15px 16px; font-size: 1.05rem;
-  font-weight: 600; color: #fff; background: var(--green); border: 0;
+  font-weight: 600; color: #fff; background: var(--primary); border: 0;
   border-radius: 10px; cursor: pointer; text-align: center; text-decoration: none;
-  margin-top: 12px;
+  margin-top: 14px; font-family: inherit; transition: background 0.12s ease;
 }
+button.btn:hover, .btn:hover { background: var(--primary-dark); }
 button.btn:active { transform: translateY(1px); }
-.btn.secondary { background: #eef2f4; color: var(--ink); }
-.btn.small { width: auto; padding: 10px 14px; font-size: 0.95rem; margin: 0; }
+.btn.secondary { background: var(--primary-tint); color: var(--primary-dark); }
+.btn.secondary:hover { background: #dce9fb; }
+.btn.small { width: auto; padding: 11px 15px; font-size: 0.95rem; margin: 0; }
 
 .row { display: flex; gap: 10px; }
 .row > * { flex: 1; }
 
+/* Password field with show/hide toggle */
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 68px; }
+.pw-toggle {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  background: var(--primary-tint); color: var(--primary-dark); border: 0;
+  padding: 7px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+
 /* Customer card */
-.balance { font-size: 2rem; font-weight: 800; color: var(--green); }
+.balance { font-size: 2.1rem; font-weight: 800; color: var(--primary); margin: 8px 0; }
 .balance small { font-size: 0.9rem; color: var(--muted); font-weight: 500; }
 .meta { color: var(--muted); font-size: 0.92rem; }
 
+/* Tags / badges */
+.tag {
+  display: inline-block; font-size: 0.78rem; font-weight: 600; padding: 3px 10px;
+  border-radius: 999px; background: var(--primary-tint); color: var(--primary-dark);
+  border: 1px solid #cfe0f8;
+}
+
 /* Alerts */
 .alert { padding: 12px 14px; border-radius: 10px; margin: 12px 0; font-size: 0.95rem; }
-.alert.ok { background: #e7f4ee; color: var(--ok); border: 1px solid #bfe3d1; }
+.alert.ok { background: #e6f4ec; color: var(--ok); border: 1px solid #bfe3cd; }
 .alert.err { background: #fbeae9; color: var(--danger); border: 1px solid #f2c9c6; }
 
-/* Tables (reports) */
+/* Tables */
 table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
+th, td { text-align: left; padding: 11px 8px; border-bottom: 1px solid var(--line); }
 th { color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
 td.num, th.num { text-align: right; }
 
-.stat { display: flex; gap: 16px; flex-wrap: wrap; }
-.stat .box { flex: 1; min-width: 120px; background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 14px; }
-.stat .box .big { font-size: 1.6rem; font-weight: 800; }
+.stat { display: flex; gap: 14px; flex-wrap: wrap; }
+.stat .box { flex: 1; min-width: 130px; background: var(--primary-tint); border: 1px solid #d3e3fa;
+  border-radius: var(--radius); padding: 15px; }
+.stat .box .big { font-size: 1.6rem; font-weight: 800; color: var(--ink); }
 .stat .box .lbl { color: var(--muted); font-size: 0.85rem; }
 
 .hint { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
 .center { text-align: center; }
 
-/* Any table stays usable on narrow screens — scroll sideways instead of
-   breaking the layout. */
+/* Any table stays usable on narrow screens — scroll sideways. */
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .table-scroll table { min-width: 480px; }
 
-/* Very small phones: tighten the top bar so nothing overflows */
+/* Checkbox row */
+.check {
+  display: flex; gap: 10px; align-items: center; margin-top: 14px;
+  padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fafcff;
+}
+.check input { width: 20px; height: 20px; flex: none; accent-color: var(--primary); }
+.check span { font-size: 0.95rem; }
+
+/* Very small phones */
 @media (max-width: 400px) {
-  .topbar { padding: 10px 12px; }
+  .topbar { padding: 11px 12px; }
   .topbar .brand { font-size: 1rem; }
   .topbar .branch { font-size: 0.8rem; }
   .nav a, .nav button { padding: 6px 10px; font-size: 0.85rem; }
-  .balance { font-size: 1.7rem; }
+  .balance { font-size: 1.8rem; }
 }

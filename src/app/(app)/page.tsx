@@ -13,6 +13,7 @@ type Customer = {
   phone: string;
   name: string;
   address: string | null;
+  monthly_medicine: boolean;
 };
 
 function OkBanner({ ok }: { ok?: string }) {
@@ -63,7 +64,7 @@ export default async function CapturePage({
     const supabase = await createClient();
     const { data: c } = await supabase
       .from("customers")
-      .select("id, phone, name, address")
+      .select("id, phone, name, address, monthly_medicine")
       .eq("phone", query)
       .maybeSingle();
 
@@ -114,6 +115,9 @@ export default async function CapturePage({
             <h2>{customer.name}</h2>
             <p className="meta">{customer.phone}</p>
             {customer.address ? <p className="meta">{customer.address}</p> : null}
+            {customer.monthly_medicine ? (
+              <p><span className="tag">Monthly medicine</span></p>
+            ) : null}
             <p className="balance">
               {balance} <small>points{balance ? ` · PKR ${balance} value` : ""}</small>
             </p>
@@ -174,6 +178,14 @@ export default async function CapturePage({
                 defaultValue={customer.address ?? ""}
                 style={{ textTransform: "uppercase" }}
               />
+              <label className="check">
+                <input
+                  type="checkbox"
+                  name="monthly_medicine"
+                  defaultChecked={customer.monthly_medicine}
+                />
+                <span>Monthly medicine customer</span>
+              </label>
               <button className="btn secondary" type="submit">
                 Save changes
               </button>
@@ -193,6 +205,10 @@ export default async function CapturePage({
             <input id="name" name="name" type="text" required autoFocus />
             <label htmlFor="address">Address</label>
             <input id="address" name="address" type="text" style={{ textTransform: "uppercase" }} />
+            <label className="check">
+              <input type="checkbox" name="monthly_medicine" />
+              <span>Monthly medicine customer</span>
+            </label>
             <button className="btn" type="submit">
               Add customer
             </button>

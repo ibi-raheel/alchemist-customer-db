@@ -1,4 +1,5 @@
 import { login } from "./actions";
+import { PasswordField } from "./PasswordField";
 
 export default async function LoginPage({
   searchParams,
@@ -26,13 +27,7 @@ export default async function LoginPage({
           <input id="email" name="email" type="email" autoComplete="username" required />
 
           <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-          />
+          <PasswordField />
 
           <button className="btn" type="submit">
             Sign in

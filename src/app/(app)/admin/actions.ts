@@ -55,5 +55,11 @@ export async function provisionBranchLogin(formData: FormData) {
     redirect(`/admin?error=login&msg=${encodeURIComponent(profErr.message)}`);
   }
 
+  // Record which email this branch uses (email only — never the password).
+  await admin.from("branch_logins").upsert(
+    { branch_id: branchId, email, updated_at: new Date().toISOString() },
+    { onConflict: "branch_id" },
+  );
+
   redirect("/admin?ok=login");
 }

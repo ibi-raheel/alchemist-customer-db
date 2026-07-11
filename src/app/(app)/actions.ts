@@ -23,6 +23,7 @@ export async function createCustomer(formData: FormData) {
   const phone = normalizePhone(String(formData.get("phone") ?? ""));
   const name = String(formData.get("name") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim().toUpperCase();
+  const monthly = formData.get("monthly_medicine") === "on";
 
   if (!phone || !name) {
     redirect(`/?phone=${encodeURIComponent(phone)}&error=missing`);
@@ -36,6 +37,7 @@ export async function createCustomer(formData: FormData) {
     phone,
     name,
     address: address || null,
+    monthly_medicine: monthly,
     created_by_branch: profile.branch_id,
   });
 
@@ -52,12 +54,13 @@ export async function updateCustomer(formData: FormData) {
   const phone = normalizePhone(String(formData.get("phone") ?? ""));
   const name = String(formData.get("name") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim().toUpperCase();
+  const monthly = formData.get("monthly_medicine") === "on";
   if (!id || !name) redirect(`/?phone=${encodeURIComponent(phone)}&error=missing`);
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("customers")
-    .update({ name, address: address || null })
+    .update({ name, address: address || null, monthly_medicine: monthly })
     .eq("id", id);
 
   if (error) redirect(`/?phone=${encodeURIComponent(phone)}&error=save`);
