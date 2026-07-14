@@ -6,6 +6,7 @@ import { MIN_REDEEM_BALANCE, PKR_PER_POINT_EARNED, DELIVERY_SLA_MINUTES } from "
 import { MonthlyField } from "./MonthlyField";
 import {
   createCustomer,
+  deletePrescription,
   recordPurchase,
   redeemPoints,
   updateCustomer,
@@ -33,6 +34,7 @@ function OkBanner({ ok }: { ok?: string }) {
     recorded: "Purchase recorded — points added.",
     redeemed: "Points redeemed.",
     prescription: "Prescription uploaded.",
+    prescription_deleted: "Prescription deleted.",
   };
   return <div className="alert ok">{map[ok] ?? "Done."}</div>;
 }
@@ -156,7 +158,17 @@ export default async function CapturePage({
             </div>
 
             {prescriptionUrl ? (
-              <p><a className="btn small secondary" href={prescriptionUrl} target="_blank" rel="noopener noreferrer">View prescription</a></p>
+              <p style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <a className="btn small secondary" href={prescriptionUrl} target="_blank" rel="noopener noreferrer">View prescription</a>
+                <form action={deletePrescription}>
+                  <input type="hidden" name="customer_id" value={customer.id} />
+                  <input type="hidden" name="phone" value={customer.phone} />
+                  <input type="hidden" name="path" value={customer.prescription_path ?? ""} />
+                  <button className="btn small" type="submit" style={{ background: "var(--danger)" }}>
+                    Delete
+                  </button>
+                </form>
+              </p>
             ) : null}
 
             {canRecord ? (

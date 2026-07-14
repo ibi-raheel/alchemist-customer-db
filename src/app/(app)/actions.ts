@@ -122,6 +122,23 @@ export async function uploadPrescription(formData: FormData) {
   redirect(`/?phone=${encodeURIComponent(phone)}&ok=prescription`);
 }
 
+// Delete a customer's prescription: remove the file from storage and clear it.
+export async function deletePrescription(formData: FormData) {
+  await requireProfile();
+  const id = String(formData.get("customer_id") ?? "");
+  const phone = normalizePhone(String(formData.get("phone") ?? ""));
+  const path = String(formData.get("path") ?? "");
+  if (!id) redirect(`/?phone=${encodeURIComponent(phone)}&error=save`);
+
+  if (path) {
+    const admin = createAdminClient();
+    await admin.storage.from("prescriptions").remove([path]);
+  }
+  const supabase = await createClient();
+  await supabase.from("customers").update({ prescription_path: null }).eq("id", id);
+  redirect(`/?phone=${encodeURIComponent(phone)}&ok=prescription_deleted`);
+}
+
 // Record a purchase; the DB trigger awards loyalty points automatically.
 // A delivery order starts the delivery timer (created_at) for the rider flow.
 export async function recordPurchase(formData: FormData) {
