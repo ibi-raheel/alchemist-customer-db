@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
+import { DELIVERY_SLA_MINUTES } from "@/lib/constants";
 
 const money = (n: number) => "PKR " + Math.round(n).toLocaleString("en-PK");
 const avg = (total: number, count: number) => (count > 0 ? total / count : 0);
@@ -37,6 +38,11 @@ export default async function ReportsPage({
     month_total: number; month_count: number;
     all_total: number; all_count: number;
   }) ?? { today_total: 0, today_count: 0, month_total: 0, month_count: 0, all_total: 0, all_count: 0 };
+
+  const { data: dstats } = await supabase.rpc("delivery_stats").single();
+  const ds = (dstats as {
+    pending: number; delivered: number; avg_minutes: number | null; ontime_pct: number | null;
+  }) ?? { pending: 0, delivered: 0, avg_minutes: null, ontime_pct: null };
 
   // Head-office-only, org-wide sections (moved here from the Admin page).
   let branchTable: { branch_id: string; branch_name: string; total: number; purchases: number }[] = [];
@@ -91,6 +97,28 @@ export default async function ReportsPage({
           <div className="box">
             <div className="big">{money(avg(t.all_total, t.all_count))}</div>
             <div className="lbl">Avg invoice</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <h2>Deliveries — {profile.branch_name ?? "All branches"}</h2>
+        <div className="stat">
+          <div className="box">
+            <div className="big">{Number(ds.pending)}</div>
+            <div className="lbl">Pending now</div>
+          </div>
+          <div className="box">
+            <div className="big">{Number(ds.delivered)}</div>
+            <div className="lbl">Delivered</div>
+          </div>
+          <div className="box">
+            <div className="big">{ds.avg_minutes != null ? `${ds.avg_minutes} min` : "—"}</div>
+            <div className="lbl">Avg delivery time</div>
+          </div>
+          <div className="box">
+            <div className="big">{ds.ontime_pct != null ? `${ds.ontime_pct}%` : "—"}</div>
+            <div className="lbl">Within {DELIVERY_SLA_MINUTES} min</div>
           </div>
         </div>
       </div>

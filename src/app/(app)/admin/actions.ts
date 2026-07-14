@@ -22,11 +22,14 @@ export async function createBranch(formData: FormData) {
 
 // Provision a login for a branch: create the auth user (service role) then
 // map it to the branch via a profiles row.
+// Provision a login for a branch or a rider: create the auth user (service role)
+// then map it to the branch via a profiles row with the chosen role.
 export async function provisionBranchLogin(formData: FormData) {
   await requireAdmin();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const branchId = String(formData.get("branch_id") ?? "");
+  const role = formData.get("role") === "rider" ? "rider" : "branch";
 
   if (!email || password.length < 8 || !branchId) {
     redirect("/admin?error=login");
@@ -45,7 +48,7 @@ export async function provisionBranchLogin(formData: FormData) {
 
   const { error: profErr } = await admin.from("profiles").insert({
     id: created.user.id,
-    role: "branch",
+    role,
     branch_id: branchId,
   });
 
@@ -55,11 +58,13 @@ export async function provisionBranchLogin(formData: FormData) {
     redirect(`/admin?error=login&msg=${encodeURIComponent(profErr.message)}`);
   }
 
-  // Record which email this branch uses (email only — never the password).
-  await admin.from("branch_logins").upsert(
-    { branch_id: branchId, email, updated_at: new Date().toISOString() },
-    { onConflict: "branch_id" },
-  );
+  // Record the branch's login email (branch role only; email only, never password).
+  if (role === "branch") {
+    await admin.from("branch_logins").upsert(
+      { branch_id: branchId, email, updated_at: new Date().toISOString() },
+      { onConflict: "branch_id" },
+    );
+  }
 
   redirect("/admin?ok=login");
 }

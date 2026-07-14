@@ -75,8 +75,13 @@ export default async function AdminPage({
       </div>
 
       <div className="card">
-        <h2>Create branch login</h2>
+        <h2>Create branch / rider login</h2>
         <form action={provisionBranchLogin}>
+          <label htmlFor="role">Login type</label>
+          <select id="role" name="role" required style={selectStyle} defaultValue="branch">
+            <option value="branch">Branch staff (records sales)</option>
+            <option value="rider">Rider (marks deliveries done)</option>
+          </select>
           <label htmlFor="branch_id">Branch</label>
           <select id="branch_id" name="branch_id" required style={selectStyle}>
             <option value="">Select a branch…</option>

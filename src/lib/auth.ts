@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export type Profile = {
   id: string;
-  role: "branch" | "admin";
+  role: "branch" | "admin" | "rider";
   branch_id: string | null;
   branch_name: string | null;
 };

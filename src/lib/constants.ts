@@ -7,3 +7,6 @@ export const MIN_REDEEM_BALANCE = 100; // need >= 100 points to redeem
 export function pointsForAmount(amount: number): number {
   return Math.floor(amount / PKR_PER_POINT_EARNED);
 }
+
+// Delivery promise — a delivery within this many minutes counts as "on time".
+export const DELIVERY_SLA_MINUTES = 30;
