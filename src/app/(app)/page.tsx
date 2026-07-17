@@ -218,7 +218,7 @@ export default async function CapturePage({
               <input type="hidden" name="customer_id" value={customer.id} />
               <input type="hidden" name="phone" value={customer.phone} />
               <label htmlFor="ename">Name</label>
-              <input id="ename" name="name" type="text" defaultValue={customer.name} required />
+              <input id="ename" name="name" type="text" defaultValue={customer.name} required style={{ textTransform: "uppercase" }} />
               <label htmlFor="eaddr">Address</label>
               <input id="eaddr" name="address" type="text" defaultValue={customer.address ?? ""} required style={{ textTransform: "uppercase" }} />
               <MonthlyField defaultChecked={customer.monthly_medicine} defaultInvoice={customer.monthly_invoice_no ?? ""} />
@@ -249,7 +249,7 @@ export default async function CapturePage({
           <form action={createCustomer} encType="multipart/form-data">
             <input type="hidden" name="phone" value={query} />
             <label htmlFor="name">Name</label>
-            <input id="name" name="name" type="text" required autoFocus />
+            <input id="name" name="name" type="text" required autoFocus style={{ textTransform: "uppercase" }} />
             <label htmlFor="address">Address</label>
             <input id="address" name="address" type="text" required style={{ textTransform: "uppercase" }} />
             <MonthlyField />

@@ -35,7 +35,7 @@ export async function signOut() {
 export async function createCustomer(formData: FormData) {
   const profile = await requireProfile();
   const phone = normalizePhone(String(formData.get("phone") ?? ""));
-  const name = String(formData.get("name") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim().toUpperCase();
   const address = String(formData.get("address") ?? "").trim().toUpperCase();
   const monthly = formData.get("monthly_medicine") === "on";
   const invoiceNo = String(formData.get("monthly_invoice_no") ?? "").trim();
@@ -82,7 +82,7 @@ export async function updateCustomer(formData: FormData) {
   await requireProfile();
   const id = String(formData.get("customer_id") ?? "");
   const phone = normalizePhone(String(formData.get("phone") ?? ""));
-  const name = String(formData.get("name") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim().toUpperCase();
   const address = String(formData.get("address") ?? "").trim().toUpperCase();
   const monthly = formData.get("monthly_medicine") === "on";
   const invoiceNo = String(formData.get("monthly_invoice_no") ?? "").trim();
