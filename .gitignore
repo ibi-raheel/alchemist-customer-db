@@ -7,3 +7,8 @@ out
 next-env.d.ts
 .DS_Store
 .vercel
+
+# Local DB backup output (contains customer PII) — never commit
+backups/
+scripts/backups/
+scripts/.env
