@@ -71,7 +71,7 @@ export default async function ReportsPage({
 
   let query = supabase
     .from("purchases")
-    .select("total_amount, points_earned, created_at, customers(name, phone), branches(name)")
+    .select("total_amount, points_earned, created_at, bill_no, customers(name, phone), branches(name)")
     .order("created_at", { ascending: false })
     .limit(50);
   if (activeBranch) query = query.eq("branch_id", activeBranch);
@@ -220,6 +220,7 @@ export default async function ReportsPage({
                 <tr>
                   <th>Customer</th>
                   <th>Branch</th>
+                  <th>Bill #</th>
                   <th className="num">Amount</th>
                   <th className="num">Pts</th>
                   <th className="num">Date &amp; time</th>
@@ -236,6 +237,7 @@ export default async function ReportsPage({
                         <div className="meta">{cust?.phone ?? ""}</div>
                       </td>
                       <td>{br?.name ?? "—"}</td>
+                      <td>{(r.bill_no as string) || "—"}</td>
                       <td className="num">{money(r.total_amount as number)}</td>
                       <td className="num">{r.points_earned as number}</td>
                       <td className="num">{dateTime(r.created_at as string)}</td>

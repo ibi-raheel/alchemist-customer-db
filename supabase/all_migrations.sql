@@ -1,7 +1,6 @@
--- Combined migrations 0001–0008 for Alchemist Customer DB.
--- Paste into Supabase → SQL Editor → Run.
+-- Combined migrations for Alchemist Customer DB. Paste into Supabase SQL Editor → Run.
 
--- ================= 0001_schema.sql =================
+-- ===== 0001_schema.sql =====
 -- 0001_schema.sql — tables, view, indexes
 -- Track 02 Customer Database. See stages/02_design/output/design.md §3.
 -- Model B: lightweight capture, no line-item/drug data (privacy by design).
@@ -73,7 +72,7 @@ create index if not exists idx_purchases_branch_date on public.purchases (branch
 create index if not exists idx_purchases_customer    on public.purchases (customer_id);
 create index if not exists idx_ledger_customer       on public.loyalty_ledger (customer_id);
 
--- ================= 0002_functions_rls.sql =================
+-- ===== 0002_functions_rls.sql =====
 -- 0002_functions_rls.sql — helper functions, loyalty engine, RLS policies
 -- See stages/02_design/output/design.md §4 and §5.
 
@@ -224,7 +223,7 @@ create policy purchases_admin_delete on public.purchases
 create policy ledger_select on public.loyalty_ledger
   for select to authenticated using (true);
 
--- ================= 0003_seed.sql =================
+-- ===== 0003_seed.sql =====
 -- 0003_seed.sql — seed the real branches (UUIDs auto-generated).
 -- Source: shared/business-context.md + owner (2026-07-11): the two Johar Town
 -- branches are Allaho Chowk and Khokhar Chowk.
@@ -241,7 +240,7 @@ on conflict do nothing;
 -- screen, not here — creating auth users requires the Supabase admin API.
 -- Bootstrap the FIRST admin once (see README "First-time setup").
 
--- ================= 0004_reporting.sql =================
+-- ===== 0004_reporting.sql =====
 -- 0004_reporting.sql — server-side aggregation for reports.
 -- All functions are SECURITY INVOKER: RLS applies, so a branch sees only its
 -- own sales and an admin sees every branch. Keeps payloads tiny (slow-internet
@@ -295,7 +294,7 @@ $$;
 grant execute on function public.my_sales_summary() to authenticated;
 grant execute on function public.branch_sales_month() to authenticated;
 
--- ================= 0005_retention.sql =================
+-- ===== 0005_retention.sql =====
 -- 0005_retention.sql — 5-year retention purge (owner-set policy).
 -- Deletes customers with no purchase in the last 5 years (and their old
 -- purchases + ledger rows). Runs as SECURITY DEFINER so it can delete across
@@ -333,7 +332,7 @@ revoke execute on function public.purge_inactive_customers() from authenticated,
 --     $$select public.purge_inactive_customers();$$
 --   );
 
--- ================= 0006_reporting_detail.sql =================
+-- ===== 0006_reporting_detail.sql =====
 -- 0006_reporting_detail.sql — deeper, all-time reporting.
 -- All SECURITY INVOKER: RLS applies (branch sees own, admin sees all).
 
@@ -407,7 +406,7 @@ grant execute on function public.my_sales_totals()        to authenticated;
 grant execute on function public.branch_sales_all()       to authenticated;
 grant execute on function public.customer_sales_summary() to authenticated;
 
--- ================= 0007_monthly_and_credentials.sql =================
+-- ===== 0007_monthly_and_credentials.sql =====
 -- 0007_monthly_and_credentials.sql
 -- (1) monthly-medicine flag on customers
 -- (2) branch login credentials, admin-visible
@@ -461,7 +460,7 @@ language sql stable security invoker set search_path = public as $$
 $$;
 grant execute on function public.customer_sales_summary() to authenticated;
 
--- ================= 0008_batch2.sql =================
+-- ===== 0008_batch2.sql =====
 -- 0008_batch2.sql — delivery tracking, rider role, monthly invoice, remark,
 -- prescription storage, org-wide customer totals.
 
@@ -536,4 +535,43 @@ grant execute on function public.customer_stats(uuid) to authenticated;
 insert into storage.buckets (id, name, public)
 values ('prescriptions', 'prescriptions', false)
 on conflict (id) do nothing;
+
+-- ===== 0009_prevent_duplicate_purchase.sql =====
+-- 0009_prevent_duplicate_purchase.sql
+-- Guard against accidental double-entry: block a second identical sale
+-- (same customer + branch + amount) within 2 minutes. Race-safe via an
+-- advisory lock, so even same-instant double-taps are caught.
+
+create or replace function public.prevent_duplicate_purchase()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  -- serialize concurrent identical inserts so a true double-tap can't slip through
+  perform pg_advisory_xact_lock(
+    hashtext(new.customer_id::text || ':' || new.branch_id::text || ':' || new.total_amount::text)
+  );
+  if exists (
+    select 1 from public.purchases
+    where customer_id = new.customer_id
+      and branch_id   = new.branch_id
+      and total_amount = new.total_amount
+      and created_at >= now() - interval '2 minutes'
+  ) then
+    raise exception 'DUPLICATE_PURCHASE' using errcode = '23505';
+  end if;
+  return new;
+end $$;
+
+-- Fires before the points-setting trigger (name sorts first), so a duplicate is
+-- rejected before any points are calculated.
+drop trigger if exists trg_prevent_dup_purchase on public.purchases;
+create trigger trg_prevent_dup_purchase
+  before insert on public.purchases
+  for each row execute function public.prevent_duplicate_purchase();
+
+-- ===== 0010_bill_no.sql =====
+-- 0010_bill_no.sql — optional bill/invoice number on each purchase.
+-- Links our record to the branch POS bill for reconciliation.
+
+alter table public.purchases
+  add column if not exists bill_no text;
 

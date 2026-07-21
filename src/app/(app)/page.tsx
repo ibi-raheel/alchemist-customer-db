@@ -46,6 +46,7 @@ function ErrBanner({ error, msg }: { error?: string; msg?: string }) {
     amount: "Enter a valid purchase amount.",
     phone: "Phone number must be exactly 11 digits.",
     nobranch: "Head Office can't record sales — sign in with a branch login.",
+    dup: "This exact sale was just recorded moments ago — not saved again.",
     points: "Enter a valid number of points.",
     file: "Please choose a file to upload.",
     save: "Could not save. Check your connection and try again.",
@@ -177,6 +178,8 @@ export default async function CapturePage({
                 <input type="hidden" name="phone" value={customer.phone} />
                 <label htmlFor="amount">Purchase amount (PKR)</label>
                 <input id="amount" name="amount" type="number" min="1" step="1" required />
+                <label htmlFor="bill_no">Bill number (optional)</label>
+                <input id="bill_no" name="bill_no" type="text" placeholder="POS bill / invoice no." />
                 <label className="check">
                   <input type="checkbox" name="is_delivery" />
                   <span>Delivery order (starts the {DELIVERY_SLA_MINUTES}-min timer)</span>

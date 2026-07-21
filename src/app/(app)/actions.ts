@@ -147,6 +147,7 @@ export async function recordPurchase(formData: FormData) {
   const phone = normalizePhone(String(formData.get("phone") ?? ""));
   const amount = Number(formData.get("amount"));
   const isDelivery = formData.get("is_delivery") === "on";
+  const billNo = String(formData.get("bill_no") ?? "").trim();
 
   if (!customerId || !Number.isFinite(amount) || amount <= 0) {
     redirect(`/?phone=${encodeURIComponent(phone)}&error=amount`);
@@ -161,9 +162,13 @@ export async function recordPurchase(formData: FormData) {
     branch_id: profile.branch_id,
     total_amount: amount,
     is_delivery: isDelivery,
+    bill_no: billNo || null,
   });
 
-  if (error) redirect(`/?phone=${encodeURIComponent(phone)}&error=save`);
+  if (error) {
+    const dup = (error.message || "").includes("DUPLICATE_PURCHASE") || error.code === "23505";
+    redirect(`/?phone=${encodeURIComponent(phone)}&error=${dup ? "dup" : "save"}`);
+  }
   revalidatePath("/");
   redirect(`/?phone=${encodeURIComponent(phone)}&ok=recorded`);
 }
