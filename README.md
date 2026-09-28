@@ -1,13 +1,45 @@
-# Alchemist Pharmacy — Customer Database & Loyalty
+<div align="center">
 
-Standalone customer-capture + loyalty system for Alchemist Pharmacy. Next.js
-(App Router) on Vercel + Supabase (Postgres, Auth, RLS). Built to be **intuitive
-and very lightweight** for slow connections: Server Components, near-zero client
-JavaScript, no UI framework, system fonts, plain HTML forms.
+<img src=".github/assets/cover.png" alt="Alchemist customer database" width="100%">
 
-> Stage 03 (Implementation) output for Track 02. Design:
-> `../../02_design/output/design.md`. Requirements:
-> `../../01_requirements/output/requirements.md`.
+# Alchemist customer database
+
+**Customer capture and loyalty for a five-branch pharmacy, built to work on slow connections.**
+
+<p>
+<a href="https://alchemist-portal.vercel.app"><img alt="Live" src="https://img.shields.io/badge/Live-open%20%E2%86%97-c8f560?style=for-the-badge&labelColor=0b0c10"></a>
+<a href="https://ibiraheel.com/p/alchemist-customer-db"><img alt="Case study" src="https://img.shields.io/badge/Case%20study-ibiraheel.com-0b0c10?style=for-the-badge&labelColor=c8f560"></a>
+</p>
+
+<p>
+<img alt="Next.js" src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white">
+<img alt="Supabase" src="https://img.shields.io/badge/Supabase-3FCF8E?style=flat-square&logo=supabase&logoColor=white">
+<img alt="Postgres RLS" src="https://img.shields.io/badge/Postgres%20RLS-4169E1?style=flat-square&logo=postgresql&logoColor=white">
+<img alt="Server Actions" src="https://img.shields.io/badge/Server%20Actions-30363D?style=flat-square">
+<img alt="Vercel" src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white">
+</p>
+
+</div>
+
+<br>
+
+> **Purchase captured in seconds, points pooled across branches**  
+> for Alchemist Pharmacy's branch staff and admin
+
+## What it did
+
+Phone number finds or creates the customer, amount records the sale, 1 point per PKR 100 accrues org-wide. Each branch sees only its own sales through Postgres row-level security; admin sees all. Near-zero client JavaScript.
+
+<sub>Outcome: reported by the owner.</sub>
+
+## How it works
+
+<p align="center"><img src=".github/assets/architecture.svg" alt="Architecture" width="100%"></p>
+
+1. Server Components and plain HTML forms so pages work on a flaky connection.
+2. Four dependencies total; no UI framework, system fonts.
+3. RLS policies enforce per-branch isolation in the database, not the app.
+4. No line-item data stored: privacy by design; inactive customers purged after five years.
 
 ## What it does
 
@@ -78,3 +110,11 @@ No drug/line-item data is stored anywhere (there is no such column), keeping thi
 system out of "sensitive/health data" scope. Consent is captured at enrollment.
 See `../../01_requirements/output/privacy-pakistan.md`. Confirm with local counsel
 before go-live (Release gate).
+
+---
+
+<div align="center">
+
+<sub>Built by <a href="https://github.com/ibi-raheel">Muhammad Ibrahim Raheel</a> · more work at <a href="https://ibiraheel.com">ibiraheel.com</a></sub>
+
+</div>
